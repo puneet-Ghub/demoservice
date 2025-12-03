@@ -8,9 +8,11 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
+       stage('Checkout Source Code') {
             steps {
-                git 'https://github.com/your-org/your-java-project.git' // Replace with your repository URL
+                // Clones the Git repository
+                git url: 'https://github.com/your-username/your-java-project.git', // Replace with your repository URL
+                    branch: 'develop' // Replace with your target branch
             }
         }
 
