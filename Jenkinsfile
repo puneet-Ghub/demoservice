@@ -11,7 +11,7 @@ pipeline {
        stage('Checkout Source Code') {
             steps {
                 // Clones the Git repository
-                git url: 'https://github.com/your-username/your-java-project.git', // Replace with your repository URL
+                git url: 'https://github.com/puneet-Ghub/demoservice.git', // Replace with your repository URL
                     branch: 'develop' // Replace with your target branch
             }
         }
