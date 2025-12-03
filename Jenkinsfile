@@ -5,7 +5,7 @@ pipeline {
         // Defines the Maven tool to use, ensure 'maven-3' matches the name configured in Jenkins Global Tool Configuration
         maven 'Maven-3.9.11'
         // Defines the JDK to use, ensure 'jdk-11' matches the name configured in Jenkins Global Tool Configuration
-        jdk 'amazon-jdk-21' 
+        jdk 'amazon-jdk-17' 
     }
 
     stages {
