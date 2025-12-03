@@ -1,64 +1,77 @@
 pipeline {
-    agent any // Defines where the pipeline will run (e.g., on any available agent)
+    agent any // Specifies that the pipeline can run on any available agent
 
     tools {
-        // Specify the Maven tool configuration defined in Jenkins Global Tool Configuration
-        maven 'maven-3.8.6' // Replace with your Maven tool name
-        jdk 'jdk-21' // Replace with your JDK tool name
+        // Defines the Maven tool to use, ensure 'maven-3' matches the name configured in Jenkins Global Tool Configuration
+        maven 'Maven-3.9.11'
+        // Defines the JDK to use, ensure 'jdk-11' matches the name configured in Jenkins Global Tool Configuration
+        jdk 'amazon-jdk-21' 
     }
 
     stages {
-       stage('Checkout Source Code') {
+        stage('Checkout Source Code') {
             steps {
-                // Clones the Git repository
-                git url: 'https://github.com/puneet-Ghub/demoservice.git', // Replace with your repository URL
-                    branch: 'develop' // Replace with your target branch
+                // Checkout the source code from the Git repository
+                git branch: 'develop', // Or your specific branch, e.g., 'develop'
+                    //credentialsId: 'your-git-credentials-id', // ID of your stored Jenkins credentials
+                    url: 'https://github.com/shyamjava/demoservice.git' // URL of your Git repository
             }
         }
-
         stage('Build') {
             steps {
-                sh 'mvn clean install -DskipTests' // Builds the project, skipping tests
+                // Cleans, compiles, and packages the Java application using Maven, skipping tests for faster build
+               bat 'mvn -B -DskipTests clean package'
             }
         }
 
         stage('Test') {
             steps {
-                sh 'mvn test' // Runs the project's unit tests
+                // Runs the unit tests using Maven
+               bat 'mvn test'
+            }
+            post {
+                always {
+                    // Publishes JUnit test results for reporting in Jenkins
+                    junit 'target/surefire-reports/*.xml'
+                }
             }
         }
 
         stage('Package') {
             steps {
-                sh 'mvn package' // Packages the application (e.g., creates a JAR/WAR)
+                // Packages the application into a JAR or WAR file
+               bat 'mvn package'
             }
         }
+
       stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('local-sonarqube') { // Replace with the name of your SonarQube server configured in Jenkins
-                    sh "mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=demoservice -Dsonar.java.binaries="target/classes" -Dsonar.login=src/main/java'
-                    // Optional: Add specific SonarQube properties if needed, e.g., -Dsonar.sources=src/main/java
+                withSonarQubeEnv('local-sonarqube') { // Replace with your configured SonarQube server name
+                   bat 'mvn sonar:sonar -Dsonar.projectKey=demoservice -Dsonar.java.binaries="target/classes" -Dsonar.sources=src/main/java'
+                    // Add other SonarQube properties as needed
                 }
             }
         }
-        // Optional: Add a deployment stage
+
+        // Optional: Add a deployment stage here if needed
         // stage('Deploy') {
         //     steps {
-        //         // Example: Copy artifact to a server
-        //         sh 'scp target/your-app.jar user@your-server:/path/to/deploy'
+        //         // Example: Deploy to a server or artifact repository
+        //         sh 'scp target/*.jar user@server:/path/to/deploy'
         //     }
         // }
     }
 
     post {
+        // Actions to perform after the pipeline completes, regardless of success or failure
         always {
             echo 'Pipeline finished.'
         }
         success {
-            echo 'Build successful!'
+            echo 'Pipeline succeeded!'
         }
         failure {
-            echo 'Build failed!'
+            echo 'Pipeline failed!'
         }
     }
 }
