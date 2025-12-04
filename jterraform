@@ -9,10 +9,12 @@ pipeline {
 
     stages {
         stage('Checkout') {
-            steps {
-                git branch: 'develop', url: 'https://github.com/puneet-Ghub/demoservice.git'
-            }
-        }
+    steps {
+        git branch: 'develop',
+            url: 'https://github.com/puneet-Ghub/demoservice.git',
+            credentialsId: 'git-creds'
+    }
+}
 
         stage('Terraform Init') {
             steps {
